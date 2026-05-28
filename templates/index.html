@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0f0c1b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>YFT Downloader - កម្មវិធីទាញយកវីដេអូ</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:ital,wght@0,100..700;1,100..700&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Styling -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="glass-bg"></div>
+    
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-area">
+                <i class="fa-solid fa-cloud-arrow-down logo-icon"></i>
+                <div>
+                    <h1>YFT <span class="gradient-text">Downloader</span></h1>
+                    <p class="tagline">ទាញយកវីដេអូបានលឿន និងជោគជ័យ ១០០%</p>
+                </div>
+            </div>
+            <!-- PWA Install Button -->
+            <button id="install-btn" class="install-btn hidden">
+                <i class="fa-solid fa-circle-down"></i> ដំឡើងកម្មវិធី (Install)
+            </button>
+        </header>
+
+        <!-- Main Content Grid -->
+        <main class="main-content">
+            <!-- Platform Badges Indicator -->
+            <div class="platforms-bar card">
+                <span class="platform-indicator" data-platform="youtube" id="badge-youtube">
+                    <i class="fa-brands fa-youtube"></i> YouTube
+                </span>
+                <span class="platform-indicator" data-platform="facebook" id="badge-facebook">
+                    <i class="fa-brands fa-facebook"></i> Facebook
+                </span>
+                <span class="platform-indicator" data-platform="tiktok" id="badge-tiktok">
+                    <i class="fa-brands fa-tiktok"></i> TikTok
+                </span>
+            </div>
+
+            <!-- Downloader Form Card -->
+            <section class="downloader-card card">
+                <h2>ទាញយកវីដេអូរបស់អ្នកទីនេះ</h2>
+                <p class="desc">សូមបិទភ្ជាប់ (Paste) តំណភ្ជាប់វីដេអូ YouTube, Facebook ឬ TikTok ដើម្បីទាញយក៖</p>
+                
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-link input-icon"></i>
+                    <input type="url" id="video-url" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off">
+                    <button id="btn-paste" class="btn-secondary" title="បិទភ្ជាប់តំណភ្ជាប់">
+                        <i class="fa-solid fa-clipboard"></i> <span>Paste</span>
+                    </button>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="btn-analyze" class="btn-primary">
+                        <i class="fa-solid fa-magnifying-glass-chart"></i> <span>វិភាគវីដេអូ (Analyze)</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Loading Spinner (Skeleton) -->
+            <section id="loading-area" class="loading-area card hidden">
+                <div class="skeleton-thumbnail">
+                    <i class="fa-solid fa-circle-notch fa-spin spinner-icon"></i>
+                </div>
+                <div class="skeleton-details">
+                    <div class="skeleton-line title"></div>
+                    <div class="skeleton-line text"></div>
+                    <div class="skeleton-line btn"></div>
+                </div>
+            </section>
+
+            <!-- Video Info Preview Card (Loaded State) -->
+            <section id="preview-area" class="preview-card card hidden">
+                <div class="preview-layout">
+                    <div class="thumbnail-wrapper">
+                        <img id="video-thumb" src="" alt="Thumbnail">
+                        <span id="video-duration" class="duration-badge">00:00</span>
+                        <span id="platform-badge" class="platform-badge youtube">YouTube</span>
+                    </div>
+                    <div class="preview-info">
+                        <h3 id="video-title">ចំណងជើងវីដេអូ</h3>
+                        <p class="uploader"><i class="fa-solid fa-user-ninja"></i> <span id="video-uploader">Creator</span></p>
+                        
+                        <div class="format-container">
+                            <label for="format-select">ជ្រើសរើសទម្រង់ដោនឡូត (Format):</label>
+                            <select id="format-select" class="custom-select">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+
+                        <button id="btn-download" class="btn-download-trigger">
+                            <i class="fa-solid fa-circle-down"></i> ទាញយកវីដេអូ (Download Now)
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Progress Tracker -->
+            <section id="progress-area" class="progress-card card hidden">
+                <h3>កំពុងដំណើរការទាញយក...</h3>
+                <div class="progress-steps">
+                    <div class="step active" id="step-extract">
+                        <div class="step-num">1</div>
+                        <div class="step-label">វិភាគវីដេអូ</div>
+                    </div>
+                    <div class="step" id="step-download">
+                        <div class="step-num">2</div>
+                        <div class="step-label">ដោនឡូតលើ Server</div>
+                    </div>
+                    <div class="step" id="step-stream">
+                        <div class="step-num">3</div>
+                        <div class="step-label">ផ្ទេរឯកសារចូលទូរសព្ទ</div>
+                    </div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill"></div>
+                </div>
+                <p id="progress-status-text" class="status-text">សូមរង់ចាំមួយភ្លែត...</p>
+            </section>
+
+            <!-- PC/QR Sharing Info (Only shown or styled nicely) -->
+            <section class="qr-share-card card">
+                <div class="qr-layout">
+                    <div class="qr-details">
+                        <h3><i class="fa-solid fa-mobile-screen-button"></i> ប្រើនៅលើទូរសព្ទ Android 15+</h3>
+                        <p>បងអាចប្រើប្រាស់កម្មវិធីនេះនៅលើទូរសព្ទដៃរបស់បងបានយ៉ាងងាយស្រួល! គ្រាន់តែ៖</p>
+                        <ol>
+                            <li>ភ្ជាប់ទូរសព្ទ និងកុំព្យូទ័រទៅនឹង <strong>Wi-Fi តែមួយ</strong></li>
+                            <li>ស្កេន <strong>QR Code</strong> នេះ ឬបើកអាសយដ្ឋាន៖<br>
+                                <code class="ip-address">http://<span id="host-ip">{{ local_ip }}</span>:5000</code>
+                            </li>
+                            <li>ចុចប៊ូតុង <strong>"ដំឡើងកម្មវិធី" (PWA)</strong> ដើម្បីបើកពេញអេក្រង់ទូរសព្ទដៃ</li>
+                        </ol>
+                    </div>
+                    <div class="qr-code-wrapper">
+                        <!-- Google/QR API for generating network address qr code -->
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=http://{{ local_ip }}:5000&color=0f0c1b&bgcolor=ffffff" alt="Scan QR Code to open on Mobile" id="qr-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Download History Section -->
+            <section class="history-card card">
+                <h3><i class="fa-solid fa-clock-rotate-left"></i> ប្រវត្តិនៃការទាញយក (History)</h3>
+                <div id="history-list" class="history-list">
+                    <p class="empty-history">មិនទាន់មានប្រវត្តិទាញយកនៅឡើយទេ។</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>© 2026 YFT Downloader. រចនាឡើងយ៉ាងពិសេសសម្រាប់ Android 15+</p>
+        </footer>
+    </div>
+
+    <!-- Script -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
