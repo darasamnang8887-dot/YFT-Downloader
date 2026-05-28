@@ -97,7 +97,12 @@ def get_video_info():
         'skip_download': True,
         'quiet': True,
         'no_warnings': True,
-        'ffmpeg_location': ffmpeg_exe
+        'ffmpeg_location': ffmpeg_exe,
+        'extractor_args': {
+            'youtube': {
+                'player_client': ['ios']
+            }
+        }
     }
 
     try:
@@ -191,6 +196,11 @@ def download_video():
         'outtmpl': output_template,
         'quiet': True,
         'no_warnings': True,
+        'extractor_args': {
+            'youtube': {
+                'player_client': ['ios']
+            }
+        }
     }
     
     # Custom options based on formats selected
